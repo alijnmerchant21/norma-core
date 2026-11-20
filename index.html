@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NormaCore Track Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Ali Builds kit. Layout idea: one reading column, each section a bordered card, graphics made of boxes and bars. */
+:root{
+  color-scheme: light;
+  --paper:#FBF6EC;
+  --card:#FFFDF8;
+  --ink:#1B1B2A;
+  --muted:#5B5B6E;
+  --orange:#F26A1B;
+  --lavender:#D9CFF7;
+  --sky:#CDE6F7;
+  --mint:#CDEEDB;
+  --butter:#FBEBB0;
+  --peach:#FBD5C2;
+  --display:"Fraunces", Georgia, serif;
+  --body:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  --hand:"Caveat", "Comic Sans MS", cursive;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background-color:var(--paper);
+  background-image:radial-gradient(rgba(27,27,42,.13) 1px, transparent 1px);
+  background-size:22px 22px;
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.55;
+}
+main{max-width:980px;margin:0 auto;padding:32px 16px 64px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(34px,6vw,56px);font-weight:800}
+h2{font-size:clamp(24px,3.6vw,32px);font-weight:800}
+h3{font-size:19px;font-weight:600}
+p{margin:0;max-width:68ch}
+a{color:var(--ink);text-decoration-thickness:2px;text-underline-offset:3px}
+a:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.kicker{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hl{background:linear-gradient(transparent 58%, var(--butter) 58%)}
+.num{font-family:var(--mono);font-weight:700;color:var(--orange);font-variant-numeric:tabular-nums}
+.hand{font-family:var(--hand);font-size:22px;line-height:1.2}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:24px;display:flex;flex-direction:column;gap:16px}
+.sticker{display:inline-block;font-family:var(--mono);font-size:12px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:4px 12px;background:var(--butter);transform:rotate(-2deg)}
+header{display:flex;flex-direction:column;gap:14px}
+.lede{font-size:18px}
+.verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.verdict div{border:2px solid var(--ink);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.verdict div:nth-child(1){background:var(--mint)}
+.verdict div:nth-child(2){background:var(--sky)}
+.verdict div:nth-child(3){background:var(--peach)}
+.verdict b{font-family:var(--display);font-size:18px;line-height:1.2}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14.5px}
+th,td{border-bottom:2px solid rgba(27,27,42,.15);padding:10px 10px;text-align:left;vertical-align:top}
+thead th{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;border-bottom:3px solid var(--ink)}
+th.win,td.win{background:var(--butter)}
+td.c{text-align:center;font-family:var(--mono);font-weight:700}
+.yes{display:inline-block;min-width:44px;padding:2px 8px;border:2px solid var(--ink);border-radius:999px;background:var(--mint)}
+.no{display:inline-block;min-width:44px;padding:2px 8px;border:2px dashed var(--muted);border-radius:999px;color:var(--muted);font-weight:500}
+.teams{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.team{border:2px solid var(--ink);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--card)}
+.team.win{background:var(--butter);box-shadow:4px 4px 0 var(--ink)}
+.team small{color:var(--muted)}
+.team ul,.list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center;font-size:14px}
+.track{height:26px;border:2px solid var(--ink);border-radius:8px;background:var(--card);overflow:hidden}
+.fill{height:100%;background:var(--lavender);border-right:2px solid var(--ink)}
+.fill.win{background:var(--orange)}
+.why{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:0;align-items:stretch}
+.layer{border:3px solid var(--ink);border-radius:12px;padding:10px 14px;background:var(--card);display:flex;flex-direction:column;gap:2px}
+.layer b{font-family:var(--display);font-size:17px}
+.layer span{font-size:13.5px;color:var(--muted)}
+.layer.k{background:var(--orange);color:#fff}
+.layer.k span{color:#fff}
+.arrow{align-self:center;font-family:var(--mono);font-weight:700;line-height:1;padding:3px 0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.reasons{display:flex;flex-direction:column;gap:12px}
+.reason{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+.reason .n{font-family:var(--display);font-weight:800;font-size:30px;color:var(--orange);line-height:1}
+.timeline{display:flex;flex-direction:column;gap:0;border-left:3px solid var(--ink);margin-left:8px}
+.ev{position:relative;padding:8px 0 12px 22px;display:grid;grid-template-columns:92px 1fr;gap:12px}
+.ev::before{content:"";position:absolute;left:-9px;top:14px;width:12px;height:12px;border-radius:50%;background:var(--card);border:3px solid var(--ink)}
+.ev.hack::before{background:var(--orange)}
+.ev.now::before{background:var(--mint)}
+.ev time{font-family:var(--mono);font-size:12.5px;font-weight:700;padding-top:3px}
+.ev p{font-size:15px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.box{border:2px solid var(--ink);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.box.sky{background:var(--sky)}.box.mint{background:var(--mint)}.box.lav{background:var(--lavender)}.box.peach{background:var(--peach)}.box.butter{background:var(--butter)}
+.pain{display:grid;grid-template-columns:54px 1fr;gap:14px;border:2px solid var(--ink);border-radius:14px;padding:14px;background:var(--card)}
+.pain.top{background:var(--peach);box-shadow:4px 4px 0 var(--ink)}
+.pain .rank{font-family:var(--display);font-weight:800;font-size:34px;color:var(--orange);line-height:1}
+.pain div{display:flex;flex-direction:column;gap:6px}
+.src{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.note{font-size:13.5px;color:var(--muted)}
+footer{font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:8px}
+footer ul{margin:0;padding-left:18px;columns:2;column-gap:28px}
+.quad{display:grid;grid-template-columns:34px 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:10px;align-items:stretch}
+.quad .ax{font-family:var(--mono);font-size:12px;font-weight:700;text-align:center;align-self:center}
+.quad .ay{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--mono);font-size:12px;font-weight:700;text-align:center;justify-self:center}
+.q{border:3px solid var(--ink);border-radius:14px;padding:14px;min-height:118px;display:flex;flex-direction:column;gap:8px;background:var(--card)}
+.q.best{background:var(--orange);color:#fff;box-shadow:5px 5px 0 var(--ink)}
+.q.empty{border-style:dashed;color:var(--muted)}
+.q b{font-family:var(--display);font-size:18px;line-height:1.15}
+.q span{font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--ink);border-radius:999px;padding:5px 12px;font-size:13.5px;background:var(--card)}
+.chip b{font-family:var(--mono);color:var(--orange);margin-left:6px}
+.check{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;font-size:14.5px}
+.check li{padding-left:26px;position:relative}
+.check li::before{content:"";position:absolute;left:0;top:3px;width:14px;height:14px;border:2px solid var(--ink);border-radius:4px;background:var(--butter)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tile{border:3px solid var(--ink);border-radius:14px;padding:14px;background:var(--card);display:flex;flex-direction:column;gap:4px}
+.tile .big{font-family:var(--display);font-weight:800;font-size:44px;line-height:1;color:var(--orange);font-variant-numeric:tabular-nums}
+.tile span{font-size:13.5px}
+.strip{position:relative;height:120px;margin:8px 6px 0}
+.strip .axis{position:absolute;left:0;right:0;top:62px;height:3px;background:var(--ink)}
+.strip .quiet{position:absolute;top:34px;height:58px;left:58.8%;width:37.9%;background:repeating-linear-gradient(45deg,var(--peach),var(--peach) 8px,transparent 8px,transparent 16px);border:2px dashed var(--ink);border-radius:8px}
+.strip .quiet b{position:absolute;left:8px;top:-24px;font-family:var(--hand);font-size:20px;white-space:nowrap}
+.strip .dot{position:absolute;top:54px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--lavender);border:3px solid var(--ink)}
+.strip .flag{position:absolute;top:18px;width:4px;height:46px;margin-left:-2px;background:var(--orange)}
+.strip .flag i{position:absolute;top:-20px;left:-40px;width:84px;text-align:center;font-style:normal;font-family:var(--mono);font-size:11px;font-weight:700}
+.strip .tick{position:absolute;top:92px;font-family:var(--mono);font-size:11px;color:var(--muted);transform:translateX(-2px)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;border:2px solid var(--ink);border-radius:50%;vertical-align:-2px;margin-right:6px}
+.hbars{display:flex;flex-direction:column;gap:8px}
+.hb{display:grid;grid-template-columns:170px 1fr 28px;gap:10px;align-items:center;font-size:14px}
+.hb .track{height:22px}
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch}
+.stage{border:3px solid var(--ink);border-right-width:0;padding:12px 10px;background:var(--card);display:flex;flex-direction:column;gap:8px}
+.stage:first-child{border-radius:14px 0 0 14px}
+.stage:last-child{border-right-width:3px;border-radius:0 14px 14px 0}
+.stage b{font-family:var(--display);font-size:17px}
+.stage .step{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted)}
+.stage.bad{background:var(--peach)}
+.tag{display:block;font-size:12.5px;line-height:1.3;border:2px solid var(--ink);border-radius:8px;padding:4px 6px;background:var(--butter)}
+.tag.hot{background:var(--orange);color:#fff}
+.dof{display:grid;grid-template-columns:150px 1fr;gap:10px 14px;align-items:center;font-size:14px}
+.cells{display:flex;gap:6px;flex-wrap:wrap}
+.cell{width:34px;height:34px;border:3px solid var(--ink);border-radius:8px;background:var(--mint);font-family:var(--mono);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.cell.miss{background:var(--card);border-style:dashed;color:var(--orange)}
+.gantt{display:flex;flex-direction:column;gap:8px}
+.grow{display:grid;grid-template-columns:190px 1fr;gap:10px;align-items:center;font-size:13.5px}
+.glane{position:relative;height:24px;background:repeating-linear-gradient(90deg,rgba(27,27,42,.08),rgba(27,27,42,.08) 1px,transparent 1px,transparent 9.756%);border-radius:6px}
+.gbar{position:absolute;top:0;bottom:0;border:2px solid var(--ink);border-radius:6px;background:var(--lavender)}
+.gbar.s{background:var(--card);border-style:dashed}
+.gbar.o{background:var(--orange)}
+.gbar.m{background:var(--mint)}
+.gaxis{position:relative;height:16px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.gaxis span{position:absolute;top:0}
+.build{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.lay{border:3px solid var(--ink);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;position:relative}
+.lay .n{font-family:var(--mono);font-size:12px;font-weight:700}
+.lay .demo{font-family:var(--hand);font-size:21px;line-height:1.15}
+@media (max-width:760px){
+  .tiles{grid-template-columns:1fr 1fr}
+  .check{grid-template-columns:1fr}
+  .quad{grid-template-columns:22px 1fr 1fr}
+  .build{grid-template-columns:1fr}
+  .pipe{grid-template-columns:1fr}
+  .stage,.stage:first-child,.stage:last-child{border-right-width:3px;border-bottom-width:0;border-radius:0}
+  .stage:first-child{border-radius:14px 14px 0 0}
+  .stage:last-child{border-bottom-width:3px;border-radius:0 0 14px 14px}
+  .hb{grid-template-columns:120px 1fr 24px}
+  .grow{grid-template-columns:1fr}
+  .dof{grid-template-columns:1fr}
+  .strip .flag i{font-size:10px}
+  .verdict,.teams,.why,.two,.split{grid-template-columns:1fr}
+  .bar{grid-template-columns:100px 1fr 48px}
+  .ev{grid-template-columns:1fr;gap:2px}
+  footer ul{columns:1}
+  .card{padding:18px;box-shadow:4px 4px 0 var(--ink)}
+}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <span class="kicker">HackLab #2 · CIC Berlin · November 21 to 22, 2026</span>
+  <h1>NormaCore track <span class="hl">briefing</span></h1>
+  <p class="lede">What the June teams built, why Team 5 won, what NormaCore has shipped since, and where their users still get stuck. Updated with four team write-ups, two public repos and NormaCore's own case study.</p>
+  <div><span class="sticker">Unofficial. Not affiliated with NormaCore or HackLab.</span></div>
+</header>
+
+<section class="card" aria-labelledby="s0">
+  <span class="kicker">The short version</span>
+  <h2 id="s0">Three things to carry into Saturday</h2>
+  <div class="verdict">
+    <div><b>Team 5 finished both halves.</b><span>Team 2 had a working agent but no usable policy. Team 4 had a working policy but no agent. Team 5 shipped an agent supervising a policy.</span></div>
+    <div><b>NormaCore sells the data layer.</b><span>Station is the product. The arm is the way in. Since June their releases went to field hardware, not to training.</span></div>
+    <div><b>The open wound is record to deploy.</b><span>The 8-servo mismatch is a 2-line fix. The real cost is a string of silent traps that Team 4 wrote down and Team 2 never got past.</span></div>
+  </div>
+  <div class="tiles">
+    <div class="tile"><span class="big">3 / 4</span><span>known June teams wrote their own Station MCP server</span></div>
+    <div class="tile"><span class="big">103</span><span>days since the last Station release (August 9)</span></div>
+    <div class="tile"><span class="big">204</span><span>days since the last training feature (April 30)</span></div>
+    <div class="tile"><span class="big">2 lines</span><span>is the whole fix for the 8-servo trainer mismatch</span></div>
+  </div>
+</section>
+
+<section class="card" aria-labelledby="s1">
+  <span class="kicker">01 · June 20 to 21, HackLab #1</span>
+  <h2 id="s1">The projects, side by side</h2>
+  <p>Five teams took the track. NormaCore's own case study describes the challenge as AI agents, vision, teleoperation and manipulation on physical hardware in one weekend. Four of the five now have write-ups I could read. Team 3 is still missing.</p>
+
+  <div class="teams">
+    <div class="team">
+      <span class="kicker">First spotlight</span>
+      <h3>"Joe"</h3>
+      <small>Moataz M., Efe Erdal, Ike Stuhr, Venay Chawda, Amirreza Alasti</small>
+      <ul>
+        <li>Voice-controlled ElRobot</li>
+        <li>Upgraded the Station Viewer: camera mode, calibration and detection overlays, a 5×3 board view</li>
+        <li>Python FastMCP server for Claude Code, Cursor and a voice agent, over TCP</li>
+        <li>Mapped 15 board squares to calibrated positions</li>
+      </ul>
+    </div>
+    <div class="team">
+      <span class="kicker">Team 2</span>
+      <h3>Assistive robot</h3>
+      <small>Shubham Pradip Tangadpalliwar, Jaseel Kt, Oussama Zenkri, Abhishek Thakur</small>
+      <ul>
+        <li>Tried to train a VLA first, could not get a usable checkpoint, then pivoted</li>
+        <li>Claude picks a pixel in the overhead camera. A pre-taught grid turns that pixel into a joint pose by interpolation. No depth camera, no inverse kinematics.</li>
+        <li>MCP tools: look, move_to_pixel, nudge, grasp, release, deliver, home, drag, stack_on, push, wave</li>
+        <li>React dashboard with Claude's reasoning, tool calls and a Stop button</li>
+        <li>Voice: browser speech to text, Claude, an OpenAI narrator, ElevenLabs</li>
+        <li>NormaCore praised them for asking questions in Discord and for publishing a repo, a model and a dataset</li>
+      </ul>
+    </div>
+    <div class="team">
+      <span class="kicker">Team 4 · "Team Waffle"</span>
+      <h3>Full VLA pipeline</h3>
+      <small>Sitong Ye, Joao Pedro Miranda Marques, Ozkan Ceylan</small>
+      <ul>
+        <li>Went all in on training: teleoperate, export, fine-tune SmolVLA, deploy</li>
+        <li>47 demonstration episodes, 10,000 steps, batch size 64, on a Nebius L40S</li>
+        <li>Patched the trainer for 8 joints</li>
+        <li>Two sequential tasks: "put the waffle in the red box", then "move the waffle to the black side"</li>
+        <li>Wrote a "walk mode" so the arm glides to the policy target instead of freezing</li>
+        <li>A Claude supervisor was planned and missed the deadline</li>
+      </ul>
+    </div>
+    <div class="team win">
+      <span class="kicker">Team 5 · Winner</span>
+      <h3>NORMA</h3>
+      <small>Manas Reddy Arumalla, Bhanuteja Vadlamudi and team</small>
+      <ul>
+        <li>Natural Object Recognition &amp; Motion Automation</li>
+        <li>LLMs plus SmolVLA plus taught robot primitives</li>
+        <li>FastMCP server (station_mcp.py) over TCP and NormFS</li>
+        <li>A "Claude Supervisor Stack" as one of at least two motion schemes</li>
+        <li>All safety limits live in the server</li>
+        <li>Three demos: carrot pick and place, color sorting, gesture answers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>Capability in the public write-up</th><th>"Joe"</th><th>Team 2</th><th>Team 4</th><th class="win">NORMA</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Station API wrapped as an MCP server</td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="no">n/m</span></td><td class="c win"><span class="yes">yes</span></td></tr>
+        <tr><td>Voice input</td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="no">n/m</span></td><td class="c win"><span class="yes">yes</span></td></tr>
+        <tr><td>Agent plans a goal given in plain language</td><td class="c"><span class="no">n/m</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="no">n/m</span></td><td class="c win"><span class="yes">yes</span></td></tr>
+        <tr><td>Custom operator UI</td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="no">n/m</span></td><td class="c win"><span class="no">n/m</span></td></tr>
+        <tr><td>Taught poses or primitives</td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="no">n/m</span></td><td class="c win"><span class="yes">yes</span></td></tr>
+        <tr><td>Trained VLA policy running on the arm</td><td class="c"><span class="no">n/m</span></td><td class="c"><span class="no">blocked</span></td><td class="c"><span class="yes">yes</span></td><td class="c win"><span class="yes">yes</span></td></tr>
+        <tr><td>LLM supervising that policy</td><td class="c"><span class="no">n/m</span></td><td class="c"><span class="no">designed</span></td><td class="c"><span class="no">missed</span></td><td class="c win"><span class="yes">yes</span></td></tr>
+        <tr><td>Safety limits or clamping</td><td class="c"><span class="no">n/m</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="yes">yes</span></td><td class="c win"><span class="yes">yes</span></td></tr>
+        <tr><td>More than one task shown</td><td class="c"><span class="no">n/m</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="yes">yes</span></td><td class="c win"><span class="yes">3</span></td></tr>
+        <tr><td>Public repo, model and dataset</td><td class="c"><span class="no">repo</span></td><td class="c"><span class="yes">yes</span></td><td class="c"><span class="yes">yes</span></td><td class="c win"><span class="no">n/m</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">n/m means not mentioned in what I could read. It does not prove the team lacked it. For NORMA I still only have excerpts of the post.</p>
+
+  <h3>The picture that explains the result</h3>
+  <div class="quad" role="img" aria-label="Two by two grid. Agent layer works and learned policy works on the arm: NORMA. Agent works but no policy: Joe and Team 2. Policy works but no agent: Team 4. Neither: empty.">
+    <span></span><span class="ax">NO LEARNED POLICY ON THE ARM</span><span class="ax">LEARNED POLICY ON THE ARM</span>
+    <span class="ay">AGENT LAYER WORKS</span>
+    <div class="q"><b>"Joe" and Team 2</b><span>Claude drives the arm through taught poses. Team 2 designed a policy slot but could not fill it.</span></div>
+    <div class="q best"><b>NORMA, the winner</b><span>Claude supervises SmolVLA and taught primitives through one safe server.</span></div>
+    <span class="ay">NO AGENT LAYER</span>
+    <div class="q empty"><b>Nobody</b><span>Every team shipped something that worked.</span></div>
+    <div class="q"><b>Team 4</b><span>A trained policy does two tasks. The supervisor missed the buzzer.</span></div>
+  </div>
+</section>
+
+<section class="card" aria-labelledby="s2">
+  <span class="kicker">02 · The winning point</span>
+  <h2 id="s2">Why Team 5 won: <span class="hl">two brains, one safe door</span></h2>
+  <div class="why">
+    <div class="stack" role="img" aria-label="NORMA architecture: Claude supervisor on top, then an MCP server holding the safety limits, then taught primitives and a SmolVLA policy side by side, then NormaCore Station, then the ElRobot arm">
+      <div class="layer" style="background:var(--lavender)"><b>Claude as supervisor</b><span>Reads the cameras, picks the next action, no fixed coordinates</span></div>
+      <div class="arrow">↓</div>
+      <div class="layer k"><b>MCP server with the safety limits</b><span>The only door to the robot. An unsafe move cannot get through.</span></div>
+      <div class="arrow">↓</div>
+      <div class="split">
+        <div class="layer" style="background:var(--mint)"><b>Taught primitives</b><span>Reliable moves, shown once</span></div>
+        <div class="layer" style="background:var(--sky)"><b>SmolVLA policy</b><span>Learned skill for the fuzzy parts</span></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="layer"><b>NormaCore Station</b><span>TCP and NormFS</span></div>
+      <div class="arrow">↓</div>
+      <div class="layer" style="background:var(--butter)"><b>ElRobot, 8 servos</b><span>Three live demos</span></div>
+    </div>
+    <div class="reasons">
+      <div class="reason"><span class="n">1</span><div><h3>They were the only team in the top right box</h3><p>Team 2 had the agent. Team 4 had the policy. NORMA had both working together. NormaCore's own case study sums the winner up in those terms: LLMs, SmolVLA and taught robot primitives.</p></div></div>
+      <div class="reason"><span class="n">2</span><div><h3>A fallback under every demo</h3><p>Primitives are dependable. The policy is flexible. Claude chooses between them. If one path fails live, another still works.</p></div></div>
+      <div class="reason"><span class="n">3</span><div><h3>Safety as architecture</h3><p>The limits sit in the server, so the pitch could say the model physically cannot command an unsafe move.</p></div></div>
+      <div class="reason"><span class="n">4</span><div><h3>Three short demos</h3><p>Carrot sorting, color sorting, gesture answers. Variety reads as a general system, not a one-trick script.</p></div></div>
+      <p class="hand">My read from four team write-ups and NormaCore's case study. NormaCore sat on the jury. The scoring itself was never published.</p>
+    </div>
+  </div>
+</section>
+
+<section class="card" aria-labelledby="s3">
+  <span class="kicker">03 · June to November</span>
+  <h2 id="s3">What changed since that hackathon</h2>
+  <h3>Release rhythm, March to November</h3>
+  <div class="strip" role="img" aria-label="Ten Station releases between March 20 and August 9, then no release for 103 days up to HackLab 2">
+    <div class="quiet"><b>103 days, no release</b></div>
+    <div class="axis"></div>
+    <span class="dot" style="left:6.9%"></span><span class="dot" style="left:13.5%"></span><span class="dot" style="left:16.1%"></span><span class="dot" style="left:16.4%"></span><span class="dot" style="left:18.6%"></span><span class="dot" style="left:21.9%;background:var(--mint)"></span><span class="dot" style="left:25.9%"></span><span class="dot" style="left:33.9%"></span><span class="dot" style="left:45.3%"></span><span class="dot" style="left:58.8%"></span>
+    <span class="flag" style="left:40.5%"><i>HackLab #1</i></span>
+    <span class="flag" style="left:88.7%"><i>Pizza Cup</i></span>
+    <span class="flag" style="left:96.7%"><i>HackLab #2</i></span>
+    <span class="tick" style="left:0%">Mar</span><span class="tick" style="left:11.3%">Apr</span><span class="tick" style="left:22.3%">May</span><span class="tick" style="left:33.6%">Jun</span><span class="tick" style="left:44.5%">Jul</span><span class="tick" style="left:55.8%">Aug</span><span class="tick" style="left:67.2%">Sep</span><span class="tick" style="left:78.1%">Oct</span><span class="tick" style="left:89.4%">Nov</span>
+  </div>
+  <div class="legend"><span><i style="background:var(--lavender)"></i>Station release</span><span><i style="background:var(--mint)"></i>Release with the SmolVLA package</span><span><i style="background:var(--orange);border-radius:2px"></i>Hackathon</span></div>
+  <p>Seven releases landed in the ten weeks before HackLab #1. Three have landed since, and none after August 9. You will be building on the same Station the Pizza Cup teams used.</p>
+  <h3>Event by event</h3>
+  <div class="timeline">
+    <div class="ev"><time>Apr 30</time><p><b>Station beta.6.</b> SmolVLA training and deployment package. This is still the last training feature in the release notes.</p></div>
+    <div class="ev"><time>Jun 2</time><p><b>Station beta.8.</b> macOS desktop app, single-motor jog, ElRobot hardware fixes.</p></div>
+    <div class="ev"><time>Jun 8, Jun 17</time><p><b>Two prototypes opened as pull requests.</b> A chat panel in the Station Viewer (#52) and a vLLM integration (#54). Both are still open.</p></div>
+    <div class="ev hack"><time>Jun 20 to 21</time><p><b>HackLab #1.</b> Five teams on the NormaCore track. NORMA wins.</p></div>
+    <div class="ev"><time>Jul 3</time><p><b>Station beta.9.</b> Yahboom Dogzilla Lite robot dog support. Portenta X8 build.</p></div>
+    <div class="ev"><time>Jul 16</time><p><b>Gravity compensation for the ElRobot leader arm</b> proposed (#83). Still open.</p></div>
+    <div class="ev"><time>Aug 9</time><p><b>Station beta.10, the latest release.</b> NormFS 0.2.0-beta.2, cellular on Portenta X8, thermal camera, solar charge controller and air quality drivers, Python client reconnect fix.</p></div>
+    <div class="ev"><time>Aug to Sep</time><p><b>Field work shows up in the tracker.</b> Rover interface on mobile networks, solar shutdown, SMS from modems. NormFS 0.3.3 and Intel Mac builds are open pull requests.</p></div>
+    <div class="ev"><time>Oct</time><p><b>Out in public.</b> ElRobot at Robo Con Amsterdam, a solar-powered LTE station in a vineyard in Cebreros, Spain, and a Nebius customer story.</p></div>
+    <div class="ev hack"><time>Late Oct</time><p><b>Robotics Pizza Hackathon, Cologne.</b> NormaCore is the engineering partner. Winners: Vladislav Imashev, Kiwook Kim, Minseon Kim and Nicolas Lee. NormaCore's post credits their attention to data quality, testing in their own simulation, and visual checks on whether the robot was doing what it should.</p></div>
+    <div class="ev now"><time>Nov 21 to 22</time><p><b>HackLab #2.</b> HackLab's announcement frames the track around collecting data, training policies and real manipulation on ElRobot.</p></div>
+  </div>
+
+  <div class="two">
+    <div class="box mint">
+      <h3>New since June</h3>
+      <ul class="list">
+        <li>Station moved from beta.8 to beta.10</li>
+        <li>Standalone cameras, sensors and thermal frames in the viewer</li>
+        <li>Robot dog, rover and solar field station support</li>
+        <li>Nebius as the training cloud, with credits at the event</li>
+        <li>A second hackathon format: teleoperate, collect, fine-tune, deploy</li>
+      </ul>
+    </div>
+    <div class="box peach">
+      <h3>Not changed since June</h3>
+      <ul class="list">
+        <li>No release since August 9</li>
+        <li>No new training or inference features</li>
+        <li>No official agent or MCP interface. The chat prototype is unmerged.</li>
+        <li>SmolVLA trainer still described as 6-DoF</li>
+        <li>Calibration and gripper issues still open</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box butter">
+    <h3>One rule to ask about at the opening</h3>
+    <p>The Pizza Cup rules say hard-coded trajectories are not allowed in scored autonomous behavior. Supporting infrastructure is allowed. If HackLab #2 copies that rule, taught primitives become a fallback and the learned policy has to carry the scored task. Ask a NormaCore mentor before you plan around primitives.</p>
+  </div>
+  <p class="note">NormaCore reposted the HackLab announcement three weeks ago with "More details soon". The real brief should come at the 09:30 opening. June teams built on Station beta.8. You will most likely get beta.10.</p>
+</section>
+
+<section class="card" aria-labelledby="s4">
+  <span class="kicker">04 · Reading their posts</span>
+  <h2 id="s4">What NormaCore focuses on, and the one thing they push</h2>
+  <div class="two">
+    <div class="box butter">
+      <span class="kicker">The one thing</span>
+      <h3>Station, the open-source data layer for Physical AI</h3>
+      <p>Every channel repeats it. One runtime that unifies robot SDKs and records full-fidelity data from any fleet. NormFS is the storage engine under it. Their stated end goal is a shared model that improves with every hour a robot runs.</p>
+    </div>
+    <div class="box sky">
+      <span class="kicker">The way in</span>
+      <h3>ElRobot</h3>
+      <p>The 3D-printed 7+1 DOF arm is what gets attention. Its launch post in February is still pinned on X. It exists so people record demonstrations into Station.</p>
+    </div>
+  </div>
+  <h3>What NormaCore praises when it writes about teams</h3>
+  <div class="chips">
+    <span class="chip">Ran the full pipeline, no shortcuts<b>Team 4</b></span>
+    <span class="chip">Adapted the code to the hardware<b>Team 4</b></span>
+    <span class="chip">Asked questions in Discord<b>Team 2</b></span>
+    <span class="chip">Published repo, model and dataset<b>Team 2, Team 4</b></span>
+    <span class="chip">Simple, controllable approach<b>Team 2</b></span>
+    <span class="chip">Extended the Station Viewer<b>"Joe"</b></span>
+    <span class="chip">Combined LLMs, SmolVLA and primitives<b>NORMA</b></span>
+    <span class="chip">Data quality<b>Pizza winners</b></span>
+    <span class="chip">Tested in simulation<b>Pizza winners</b></span>
+    <span class="chip">Visual checks on the robot<b>Pizza winners</b></span>
+  </div>
+  <p>Read as a list, this is what the people on the jury notice: how far you got through their pipeline, whether you improved their code, and whether you left something others can reuse.</p>
+  <h3>How the focus has moved</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Period</th><th>What they shipped and posted</th><th>Reads as</th></tr></thead>
+      <tbody>
+        <tr><td>Feb to Apr</td><td>ElRobot open-sourced, browser playground, SmolVLA fine-tune package</td><td>Arms and imitation learning</td></tr>
+        <tr><td>May to Jun</td><td>Remote teleoperation, dataset export, macOS app, HackLab #1</td><td>Developer experience</td></tr>
+        <tr><td>Jul to Oct</td><td>Portenta X8 "Pod", cellular, solar, thermal camera, vineyard station, AgriTech rover, robot dog</td><td>Field deployments beyond arms</td></tr>
+        <tr><td>Oct to Nov</td><td>Nebius partnership, Pizza Hackathon, HackLab #2</td><td>Record, train in the cloud, deploy</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="two">
+    <div>
+      <h3>What the 11 open pull requests are about</h3>
+      <div class="hbars" role="img" aria-label="Open pull requests by theme: sensors and drivers 3, agent and LLM prototypes 3, viewer modules 2, storage 1, platform builds 1, arm 1">
+        <div class="hb"><span>Sensors and drivers</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="num">3</span></div>
+        <div class="hb"><span>Agent and LLM prototypes</span><div class="track"><div class="fill win" style="width:100%"></div></div><span class="num">3</span></div>
+        <div class="hb"><span>Viewer modules</span><div class="track"><div class="fill" style="width:66.7%"></div></div><span class="num">2</span></div>
+        <div class="hb"><span>Storage (NormFS)</span><div class="track"><div class="fill" style="width:33.3%"></div></div><span class="num">1</span></div>
+        <div class="hb"><span>Platform builds</span><div class="track"><div class="fill" style="width:33.3%"></div></div><span class="num">1</span></div>
+        <div class="hb"><span>Arm (ElRobot)</span><div class="track"><div class="fill" style="width:33.3%"></div></div><span class="num">1</span></div>
+      </div>
+      <p class="note">The three agent prototypes (chat, vLLM, pi agent) are all marked work in progress. They want this and have not finished it.</p>
+    </div>
+    <div>
+      <h3>What the 16 open issues are about</h3>
+      <div class="hbars" role="img" aria-label="Open issues by theme: hardware and drivers 8, data and examples 4, connectivity 2, calibration 1, other 1">
+        <div class="hb"><span>Hardware and drivers</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="num">8</span></div>
+        <div class="hb"><span>Data and examples</span><div class="track"><div class="fill win" style="width:50%"></div></div><span class="num">4</span></div>
+        <div class="hb"><span>Connectivity</span><div class="track"><div class="fill" style="width:25%"></div></div><span class="num">2</span></div>
+        <div class="hb"><span>Calibration</span><div class="track"><div class="fill win" style="width:12.5%"></div></div><span class="num">1</span></div>
+        <div class="hb"><span>Other</span><div class="track"><div class="fill" style="width:12.5%"></div></div><span class="num">1</span></div>
+      </div>
+      <p class="note">Orange bars are the themes that touch a weekend build with the arm. Most of the tracker is field hardware.</p>
+    </div>
+  </div>
+  <p>Their site now calls NormaCore a "Physical Operations Platform". The Nebius story says they want commercial hardware partners and pilots in agriculture, logistics and retail within 6 to 12 months. A demo that shows Station as the system of record for robot data speaks to that. A demo that only shows a clever arm does not.</p>
+  <p class="note">Based on your screenshots of normacore.dev and four LinkedIn posts, plus their X profile, GitHub and the Nebius story.</p>
+</section>
+
+<section class="card" aria-labelledby="s5">
+  <span class="kicker">05 · Where users get stuck</span>
+  <h2 id="s5">Real pain points, ranked for this hackathon</h2>
+  <h3>Where the loop breaks</h3>
+  <div class="pipe" role="img" aria-label="Five stages: set up, teleoperate, record and export, train, deploy. Known problems are marked at each stage, with the most at record and deploy.">
+    <div class="stage"><span class="step">STEP 1</span><b>Set up</b><span class="tag">Auto-calibration can hit the table (#112)</span><span class="tag">API is port 8888, not the 8889 web UI</span></div>
+    <div class="stage"><span class="step">STEP 2</span><b>Teleoperate</b><span class="tag">No gravity compensation on the leader arm (#83)</span><span class="tag">Gripper lags under load (#101)</span></div>
+    <div class="stage bad"><span class="step">STEP 3</span><b>Record and export</b><span class="tag hot">Exactly 2 cameras, or frames are dropped</span><span class="tag">Cameras in the UI may not feed the pipeline</span><span class="tag">Export range uses queue pointers, not times</span></div>
+    <div class="stage"><span class="step">STEP 4</span><b>Train</b><span class="tag">Default is 6 joints. Fix is 2 lines.</span><span class="tag">Needs CUDA, so cloud GPU only</span><span class="tag">About 50 demos. 25 is too few.</span></div>
+    <div class="stage bad"><span class="step">STEP 5</span><b>Deploy</b><span class="tag hot">Arm freezes if it starts far from the demo pose</span><span class="tag">Two USB cameras on one controller stall</span><span class="tag">No official agent interface</span></div>
+  </div>
+  <div class="dof" role="img" aria-label="ElRobot has 8 servos. The bundled trainer defaults to 6. Team 4 fixed it by changing two constants.">
+    <span><b>ElRobot servos</b></span>
+    <div class="cells"><span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span></div>
+    <span><b>Trainer default</b></span>
+    <div class="cells"><span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell miss">+</span><span class="cell miss">+</span></div>
+  </div>
+  <p class="note">Team 4's patch sets STATE_DIM and ACTION_DIM from 6 to 8 in train.py and passes motor ids 1 to 8. I overstated this problem in the first version of this page.</p>
+  <h3>Ranked</h3>
+
+  <div class="pain top">
+    <span class="rank">1</span>
+    <div>
+      <h3>Record to deploy is full of silent traps</h3>
+      <p>Each step works in isolation and fails quietly when joined. Team 2 never got a usable checkpoint and built around it. Team 4 got through and logged every trap. Nothing in the official docs collects them in one place. Whoever turns this into a clean, repeatable path solves the problem the new track format is built on.</p>
+      <span class="src">Source: Team 4 LESSONS.md, Team 2 README, Pizza Hackathon starter README</span>
+    </div>
+  </div>
+  <div class="pain">
+    <span class="rank">2</span>
+    <div>
+      <h3>The policy only works near what it saw</h3>
+      <p>Team 4's arm would not move at all from a parked pose, because the stock runner aborts a whole tick when any joint is too far from its target. Same start pose, same lighting, same camera framing as the demos. This is where a supervisor that watches and corrects earns its place.</p>
+      <span class="src">Source: Team 4 LESSONS.md</span>
+    </div>
+  </div>
+  <div class="pain">
+    <span class="rank">3</span>
+    <div>
+      <h3>No official way for an agent to talk to Station</h3>
+      <p>Three of the four known June teams wrote their own MCP server. Team 4 first guessed the API from the task sheet and got it wrong. The viewer chat prototype has sat unmerged since June 8.</p>
+      <span class="src">Source: June spotlight posts, Team 2 and Team 4 repos, PR #52</span>
+    </div>
+  </div>
+  <div class="pain">
+    <span class="rank">4</span>
+    <div>
+      <h3>Calibration and gripper</h3>
+      <p>Auto-calibration can collide with the table depending on the starting pose (#112). The gripper stalls under load during mirroring and inference (#101). Start from a safe pose and pick light objects that are easy to grip.</p>
+      <span class="src">Source: GitHub issues</span>
+    </div>
+  </div>
+  <div class="pain">
+    <span class="rank">5</span>
+    <div>
+      <h3>Smaller traps</h3>
+      <p>Torque must be enabled before goal writes do anything. There is no "get frame" call, you follow a camera queue and keep the latest entry. The dataset video tool crashes when a dataset holds only one video (#103). The ElRobot URDF has an invalid mass (#92). Intel Macs are not supported yet (#145). Apple silicon is fine.</p>
+      <span class="src">Source: Team 4 LESSONS.md, GitHub issues and pull requests</span>
+    </div>
+  </div>
+
+  <h3>Saturday morning checklist, from Team 4's log</h3>
+  <ul class="check">
+    <li>Connect to Station on port 8888</li>
+    <li>Enable torque before the first move</li>
+    <li>Clamp to each motor's calibrated range</li>
+    <li>Two cameras, on separate USB controllers or a powered hub</li>
+    <li>Check the camera queues deliver frames, not only the web UI</li>
+    <li>Pin the servo bus to the follower arm</li>
+    <li>One task sentence, identical at recording and inference</li>
+    <li>About 50 demos, around 5 positions with 10 each</li>
+    <li>Train with unbuffered logs and at least 12 data workers</li>
+    <li>Start every rollout near the demo start pose</li>
+  </ul>
+</section>
+
+<section class="card" aria-labelledby="s6">
+  <span class="kicker">06 · So what</span>
+  <h2 id="s6">What this means for your build</h2>
+  <p>Agent plus policy has been done once, by the winner. A policy with visual checks won in Cologne. Nobody has closed the loop yet: the supervisor catches a failure, tags it in Station, and that data makes the next policy better. That is still the open spot, and it is NormaCore's own pitch.</p>
+  <div class="build">
+    <div class="lay" style="background:var(--lavender)">
+      <span class="n">LAYER 1 · MUST HAVE</span>
+      <h3>Safe control</h3>
+      <p>Station MCP server. Limits in the server. Taught poses Claude can call. Team 2's public repo shows one way to shape the tools.</p>
+      <span class="demo">Demo: "Put the red block in the cup."</span>
+    </div>
+    <div class="lay" style="background:var(--sky)">
+      <span class="n">LAYER 2 · NOW REALISTIC</span>
+      <h3>Learned skill</h3>
+      <p>Follow Team 4's path: about 50 demos, the 2-line patch, a Nebius job, walk mode at deploy. Start recording early.</p>
+      <span class="demo">Demo: the same task, run by the policy.</span>
+    </div>
+    <div class="lay" style="background:var(--butter);box-shadow:4px 4px 0 var(--ink)">
+      <span class="n">LAYER 3 · THE DIFFERENCE</span>
+      <h3>Failure loop</h3>
+      <p>Claude watches the policy, steps in when it stalls or misses, and tags the episode in Station as success, failure or correction.</p>
+      <span class="demo">Demo: knock the block away. It notices, recovers and saves the failure as training data.</span>
+    </div>
+  </div>
+  <h3>A possible 30-hour plan</h3>
+  <div class="gantt" role="img" aria-label="Suggested schedule from Saturday 11:00 to Sunday 17:45: setup 11 to 13, record demos 13 to 16, layer 1 13 to 19, train 16 to 20, deploy policy 20 to midnight, failure loop 19 to 02, sleep 02 to 08, optional retrain 08 to 12, rehearse and film 12 to 15:30, freeze and submit 15:30 to 17:45">
+    <div class="grow"><span>Set up, two cameras, calibrate</span><div class="glane"><div class="gbar m" style="left:0;width:6.5%"></div></div></div>
+    <div class="grow"><span>Record about 50 demos</span><div class="glane"><div class="gbar" style="left:6.5%;width:9.8%;background:var(--sky)"></div></div></div>
+    <div class="grow"><span>Layer 1: MCP, limits, taught poses</span><div class="glane"><div class="gbar" style="left:6.5%;width:19.5%"></div></div></div>
+    <div class="grow"><span>Train on Nebius</span><div class="glane"><div class="gbar" style="left:16.3%;width:13%;background:var(--sky)"></div></div></div>
+    <div class="grow"><span>Layer 2: deploy the policy</span><div class="glane"><div class="gbar" style="left:29.3%;width:13%;background:var(--sky)"></div></div></div>
+    <div class="grow"><span>Layer 3: failure loop and tagging</span><div class="glane"><div class="gbar o" style="left:26%;width:22.8%"></div></div></div>
+    <div class="grow"><span>Sleep in shifts</span><div class="glane"><div class="gbar s" style="left:48.8%;width:19.5%"></div></div></div>
+    <div class="grow"><span>Retrain with the tagged failures</span><div class="glane"><div class="gbar s" style="left:68.3%;width:13%"></div></div></div>
+    <div class="grow"><span>Rehearse three demos, film the hero run</span><div class="glane"><div class="gbar m" style="left:81.3%;width:11.4%"></div></div></div>
+    <div class="grow"><span>Freeze code, pitch, submit by 17:45</span><div class="glane"><div class="gbar o" style="left:92.7%;width:7.3%"></div></div></div>
+    <div class="grow"><span></span><div class="gaxis"><span style="left:0">Sat 11</span><span style="left:26%">19</span><span style="left:42.3%">00</span><span style="left:68.3%">Sun 08</span><span style="left:81.3%">12</span><span style="right:0">17:45</span></div></div>
+  </div>
+  <p class="note">Dashed bars are optional. Recording and layer 1 run in parallel, so this needs at least two people. Training time is my estimate, since Team 4 did not publish theirs. Adjust once you know your team and the real brief.</p>
+  <div class="two">
+    <div class="box lav">
+      <h3>Borrow from June</h3>
+      <ul class="list">
+        <li>Team 4's patch, Nebius job script and walk mode</li>
+        <li>Team 2's tool list and its mock mode for building without the arm</li>
+        <li>NORMA's rule that every limit lives in the server</li>
+      </ul>
+      <p class="note">Neither public repo states a license. Read them, credit them, and ask before copying code.</p>
+    </div>
+    <div class="box mint">
+      <h3>Do what the jury praises</h3>
+      <ul class="list">
+        <li>Ask in the NormaCore Discord early and often</li>
+        <li>Publish the repo, the model and the dataset before the pitch</li>
+        <li>Keep a lessons log like Team 4's. It doubles as your video script.</li>
+        <li>Say "Station" and "data" in the pitch more often than "Claude"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="kicker">Sources</span>
+  <ul>
+    <li><a href="https://github.com/norma-core/norma-core">norma-core repository</a></li>
+    <li><a href="https://github.com/norma-core/norma-core/releases">Station releases</a></li>
+    <li><a href="https://github.com/norma-core/norma-core/issues">Open issues</a></li>
+    <li><a href="https://github.com/norma-core/norma-core/pulls">Open pull requests</a></li>
+    <li><a href="https://github.com/FunRobots/robot-pizza-cup">Pizza Hackathon starter repo</a></li>
+    <li><a href="https://nebius.com/customer-stories/normacore">Nebius customer story</a></li>
+    <li><a href="https://luma.com/1857f2wa">HackLab #1 on Luma</a></li>
+    <li><a href="https://luma.com/h0mcaqio">HackLab #2 on Luma</a></li>
+    <li><a href="https://manas-arumalla.github.io/">Manas Reddy Arumalla's portfolio</a></li>
+    <li><a href="https://x.com/norma_core_dev">NormaCore on X</a></li>
+    <li><a href="https://github.com/ozkannceylan/normacore-hackathon-team4">Team 4 repository</a></li>
+    <li><a href="https://github.com/Jaseelkt007/Robotics_berlin_hack">Team 2 repository</a></li>
+    <li><a href="https://robotpizzacup.com">Robot Pizza Cup</a></li>
+    <li><a href="https://normacore.dev/deployments/#berlin-hackathon">NormaCore case study</a>, from your screenshot</li>
+    <li>NormaCore, HackLab Robotics and Team 2 LinkedIn posts, from your screenshots</li>
+  </ul>
+  <p>Compiled November 20, 2026. Release dates on GitHub show no year and are read as 2026. Unofficial. Not affiliated with NormaCore or HackLab.</p>
+</footer>
+
+</main>
+</body>
+</html>
